@@ -78,6 +78,7 @@ export class App implements AfterViewInit {
     gsap.utils.toArray('.gradient-content').forEach((content: any) => {
       const elements = content.querySelectorAll('h2, p');
 
+      // Entrada de los textos
       gsap.from(elements, {
         scrollTrigger: {
           trigger: content,
@@ -89,7 +90,7 @@ export class App implements AfterViewInit {
         scale: 0.95,
         duration: 1,
         ease: 'power3.out',
-        stagger: 0.2, // animación secuencial
+        stagger: 0.2,
       });
     });
   }
