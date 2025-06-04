@@ -11,15 +11,16 @@ export class App implements AfterViewInit {
 
   async ngAfterViewInit() {
     if (isPlatformBrowser(this.platformId)) {
-      // Carga dinámica de GSAP para SSR
       const { gsap } = await import('gsap');
       const { ScrollTrigger } = await import('gsap/ScrollTrigger');
+
       gsap.registerPlugin(ScrollTrigger);
 
-      // Esperar a que la imagen cargue
       await this.waitForImageLoad();
 
       this.initParallaxAnimation(gsap);
+      this.initTextAnimations(gsap);
+      this.initBackgroundParallax(gsap);
     }
   }
 
@@ -50,6 +51,7 @@ export class App implements AfterViewInit {
       .to('.image-container img', {
         scale: 2,
         z: 350,
+        filter: 'blur(2px)',
         transformOrigin: 'center center',
         ease: 'power1.inOut',
       })
@@ -60,7 +62,7 @@ export class App implements AfterViewInit {
           transformOrigin: 'center center',
           ease: 'power1.inOut',
         },
-        '<' // Mismo tiempo que la animación anterior
+        '<'
       )
       .to(
         '.gradient-purple',
@@ -70,5 +72,42 @@ export class App implements AfterViewInit {
         },
         '>0.5'
       );
+  }
+
+  private initTextAnimations(gsap: any) {
+    gsap.utils.toArray('.gradient-content').forEach((content: any) => {
+      const elements = content.querySelectorAll('h2, p');
+
+      gsap.from(elements, {
+        scrollTrigger: {
+          trigger: content,
+          start: 'top 80%',
+          toggleActions: 'play none none none',
+        },
+        opacity: 0,
+        y: 50,
+        scale: 0.95,
+        duration: 1,
+        ease: 'power3.out',
+        stagger: 0.2, // animación secuencial
+      });
+    });
+  }
+
+  private initBackgroundParallax(gsap: any) {
+    gsap.utils
+      .toArray('.gradient-purple, .gradient-blue')
+      .forEach((section: any) => {
+        gsap.to(section, {
+          scrollTrigger: {
+            trigger: section,
+            start: 'top bottom',
+            end: 'bottom top',
+            scrub: true,
+          },
+          backgroundPosition: '100% 50%',
+          ease: 'none',
+        });
+      });
   }
 }
